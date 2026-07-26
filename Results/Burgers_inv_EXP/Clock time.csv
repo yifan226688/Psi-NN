@@ -1,0 +1,4 @@
+Question,Number,Module,Training Time,Student Training Time
+Burgers_inv,EXP,PINN,803.1890873908997,0.0
+Burgers_inv,EXP,PINN_post_minus,1516.2747101783752,0.0
+Burgers_inv,EXP,PsiNN_burgers,1940.966340303421,0.0

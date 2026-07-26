@@ -1,0 +1,4 @@
+Question,Number,Module,Training Time,Student Training Time
+Laplace,EXP,PINN,789.7047097682953,0.0
+Laplace,EXP,PINN_post_plus,1392.7662382125854,0.0
+Laplace,EXP,PsiNN_laplace,1720.3290541172028,0.0

@@ -1,0 +1,4 @@
+Question,Number,Module,Training Time,Student Training Time
+Poisson,EXP,PINN,262.44657921791077,0.0
+Poisson,EXP,PINN_post_poisson,462.03811717033386,0.0
+Poisson,EXP,PsiNN_poisson,477.3862509727478,0.0

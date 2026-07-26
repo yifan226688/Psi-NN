@@ -64,3 +64,6 @@ class Net(nn.Module):
         u = self.fc4_1(torch.cat([u3_1,u3_2],dim=1)) 
        
         return u
+
+
+        

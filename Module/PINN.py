@@ -1,3 +1,4 @@
+# 标准的PINN网络结构
 # import numpy as np
 # coding = utf-8
 import torch

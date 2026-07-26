@@ -64,7 +64,6 @@ class Net(nn.Module):
         # u3_2 = torch.tanh(self.fc3_2(u2_3) + self.fc3_2(u2_4))
 
 
-
         #最后的输出
         u = self.fc4_1(u3_1) 
        

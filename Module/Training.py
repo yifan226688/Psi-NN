@@ -179,8 +179,11 @@ class model():
             self.cylinder_weight = float(self.model_ini_dict['cylinder_weight']) if 'cylinder_weight' in self.model_ini_dict else 1
             self.bcs_weight = float(self.model_ini_dict['bcs_weight']) if 'bcs_weight' in self.model_ini_dict else 1
 
-
     # 这里定义一下计算场
+    # 根据当前任务类型，先把后面训练要用到的“计算点/网格点/参数组合”全部准备好。
+    # 根据当前任务类型，先把后面训练要用到的“计算点/网格点/参数组合”全部准备好。
+    # 它本质上是在做一件事：
+    # 把连续定义域离散成一批可以送进神经网络和 loss 里的点。
     def mesh_init(self):
         if self.coord_num == 3:
             self.x = np.linspace(self.x_min, self.x_max, self.grid_node_num).reshape([-1,1])
@@ -215,7 +218,7 @@ class model():
                 # 将每个组合转换为torch.Tensor
                 self.para_ctrl_tensors = [torch.tensor(combination, dtype=torch.float).to(device) for combination in combinations]
 
-    # 边界条件损失
+    # 边界条件损失/初始损失
     def net_b(self):    
         loss_b = torch.tensor(0.).to(device)
 
@@ -337,6 +340,7 @@ class model():
             
         return loss_b
     
+    # 物理损失
     def net_f(self):
         
         loss_f = torch.tensor(0.).to(device)
@@ -412,7 +416,8 @@ class model():
         #     raise ValueError('The input ' + self.ques_name + ' is unintegrated or the question name is incorrect. Please check again.')
         
         return loss_f
-        
+    
+    # 正则化损失，可以切换对老师还是学生加正则
     def net_rgl(self, mode = 'teacher', object = 'all', reg_type ='l2', weight_rgl = 1e-3):
         loss_rgl = torch.tensor(0.).to(device)
 
@@ -457,6 +462,7 @@ class model():
         return loss_rgl
 
     # 已知全场数据的监督误差（知道解析式或者有数据）
+    # 数据损失
     def net_global(self, state:bool=False):
 
         loss_global = torch.tensor(0.).to(device)
@@ -491,7 +497,6 @@ class model():
             loss_global += torch.mean((u - self.u_monitor)**2)
             
         return loss_global, state
-
 
     # 有无监督值可以根据state判断。
     def net_d(self, mode = 'teacher'):
@@ -550,7 +555,7 @@ class model():
         
         return loss_d
     
-
+    # 蒸馏损失
     def net_teach(self, weight_teach = 1):
 
                
@@ -587,7 +592,7 @@ class model():
         
         return torch.mean((u_teacher - u_student)**2) * weight_teach
 
-  
+
     def train_adam(self):
         self.para_undetermin = torch.zeros(self.para_ctrl_num, requires_grad=True).float().to(device)
         self.para_undetermin = torch.nn.Parameter(self.para_undetermin)
@@ -614,7 +619,7 @@ class model():
 
                 if self.load_study_state:
                     break
-                self.loss_f = self.net_f()           
+                self.loss_f = self.net_f()      # 物理损失
                 if 'inv' in self.ques_name:
                     if 'Poisson' in self.ques_name:
                         self.loss_d = self.net_global()[0]
@@ -745,6 +750,7 @@ class model():
         print(f'\nTime occupied: {(self.time_list[0]):.5e} s.\n')
         if self.distill_state:
             print(f'\nTime occupied (student): {(self.time_list[1]):.5e} s.\n')
+
     def model_save(self, suffix:str ='', mode:str='teacher'):
 
         if not os.path.exists(f'./Results/'):
@@ -902,6 +908,7 @@ class model():
             self.result_show()
 
     def train(self): 
+
 
         model_define_trigger = 0
         
